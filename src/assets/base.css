@@ -1,0 +1,53 @@
+:root {
+  --white: #ffffff;
+  --white-soft: #fbfcfd;
+  --white-mute: #eeeff1;
+
+  --black: #000000;
+  --black-soft: #8f8f8f;
+  --black-mute: #cccccc;
+
+  --primary: #2f8cff;
+  --light-navy: #1253a2;
+
+  --small-scale: 5px;
+  --base-scale: 10px;
+  --normal-scale: 15px;
+  --large-scale: 20px;
+  --xlarge-scale: 25px;
+}
+
+:root {
+  --navigation-panel-widght: 229px;
+
+  --color-background: var(--white-soft);
+
+  --image-navigation: radial-gradient(circle at 29% 0, #000, #1c2734 103%);
+  --color-text: var(--black);
+
+  --color-text-muted: var(--black-soft);
+
+  --border-color: var(--white-mute);
+  --border-radius: 10px;
+  --border-radius-actions: 5px;
+  --box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.07);
+  --box-shadow-window: 0 0 3px 0 #000, inset 0 1px 2px 0 rgba(255, 255, 255, 0.5);
+
+  --transition: 0.2s ease all;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: var(--color-background);
+  font-family: 'Myriad Pro', sans-serif;
+}
