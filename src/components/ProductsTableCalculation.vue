@@ -77,7 +77,7 @@
 		}
 	}
 
-	@media screen and (max-width: 768px) {
+	@media (max-width: 768px) {
 		.page-content__table-calculation {
 			width: 100%;
 		}

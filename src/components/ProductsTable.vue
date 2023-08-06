@@ -435,7 +435,7 @@ import {onMounted, Ref, ref} from "vue";
 		}
 	}
 
-	@media screen and (max-width: 375px) {
+	@media (max-width: 375px) {
 		.table-contents {
 			background-color: unset;
 			box-shadow: unset;
