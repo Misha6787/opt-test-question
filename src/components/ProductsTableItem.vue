@@ -1,6 +1,10 @@
 <template>
-	<tr v-if="!mobileTable">
-		<td v-for="header in headers" :class="header.key === 'actions' ? 'action-column' : ''">
+	<div v-if="!mobileTable" class="table-row">
+		<div
+			v-for="header in headers"
+			:class="header.key === 'actions' ? 'action-column' : ''"
+			class="table-column"
+		>
 			<div v-if="header.key === 'id'">
 				<icon-burger class="handle"/>
 				{{ item.id }}
@@ -20,10 +24,10 @@
 			<div v-else>
 				<v-input />
 			</div>
-		</td>
-	</tr >
+		</div>
+	</div >
 
-	<div class="mobile-item-wrapper" v-else>
+	<div class="table-wrapper-mobile" v-else>
 		<label class="table-label">
 			<p class="table-label__text">Действия</p>
 			<icon-vertical-dots class="action-icon" v-on:click="windowAction = !windowAction"/>
@@ -179,7 +183,7 @@
 
 	// mobile styles
 
-	.mobile-item-wrapper {
+	.table-wrapper-mobile {
 		border-radius: var(--border-radius);
 		border: 1px solid var(--border-color);
 		background-color: var(--white);

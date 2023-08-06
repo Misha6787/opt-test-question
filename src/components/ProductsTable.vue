@@ -54,61 +54,54 @@
 			<!-- /.table-actions-window -->
 
 		</div>
-		<!-- /.page-content__table-actions -->
-		<div class="table-wrapper">
-			<table class="table"
-		       v-if="!mobileTable"
-		       v-on:mouseup="clearResizeData"
-		       v-on:mousemove="resizeColumn($event)"
+
+		<div class="table-wrapper" v-if="!mobileTable">
+			<draggable
+				v-model="tableHeaders"
+				tag="div"
+				:item-key="key => key"
+				v-on:end="correctHeadCells"
+				handle=".table-column-name"
+				class="table-row table-head"
 			>
-				<thead>
+				<template #item="{ element: tableHeaders }">
+					<div class="table-column">
+						<b class="table-column-name">{{ tableHeaders.name }}</b>
+						<span class="resize-handle" />
+					</div>
+				</template>
+			</draggable>
 
-					<draggable
-						v-model="tableHeaders"
-						tag="tr"
-						:item-key="key => key"
-						handle=".column-name"
-					>
-						<template #item="{ element: tableHeaders }">
-							<th scope="col">
-								<b class="column-name">{{ tableHeaders.name }}</b>
-								<div class="line" v-on:mousedown="startResize($event)" />
-							</th>
-						</template>
-					</draggable>
-
-				</thead>
-				<draggable
-					v-model="tableList"
-					item-key="id"
-					v-on:end="$emit('updateList', tableList)"
-					handle=".handle"
-					tag="tbody"
-				>
-					<template #item="{element}">
-						<products-table-item
-							:item="element"
-							:headers="tableHeaders"
-							v-on:deleteItem="$emit('deleteItem', element.id)"
-						/>
-					</template>
-				</draggable>
-			</table>
-			<!-- /.table -->
-
-			<div v-else>
-				<products-table-item
-					v-for="element in tableList"
-					item-key="element.id"
-					:item="element"
-					:mobileTable="mobileTable"
-					v-on:deleteItem="$emit('deleteItem', element.id)"
-				/>
-			</div>
-			<!-- /.mobile-items-wrapper -->
+			<draggable
+				v-model="tableList"
+				item-key="id"
+				tag="div"
+				class="table-body"
+				v-on:end="$emit('updateList', tableList)"
+				handle=".handle"
+			>
+				<template #item="{element}">
+					<products-table-item
+						:item="element"
+						:headers="tableHeaders"
+						v-on:deleteItem="$emit('deleteItem', element.id)"
+					/>
+				</template>
+			</draggable>
 
 		</div>
 		<!-- /.table-wrapper -->
+
+		<div v-else>
+			<products-table-item
+				v-for="element in tableList"
+				item-key="element.id"
+				:item="element"
+				:mobileTable="mobileTable"
+				v-on:deleteItem="$emit('deleteItem', element.id)"
+			/>
+		</div>
+
 		<products-table-calculation />
 	</div>
 	<!-- /.table-contents -->
@@ -147,63 +140,22 @@
 	const windowFilter = ref(false);
 	const mobileTable = ref(false);
 
-	let curCol: HTMLElement;
-	let nxtCol: Element;
-	let pageX: number;
-	let nxtColWidth: number;
-	let curColWidth: number;
+	const min: number = 30;
+	let headerBeingResized: HTMLElement | null;
 
+	let tableWrapper: HTMLElement;
 	let table: HTMLElement;
-	let tableWidth: number;
 
-	const setHeightLines = ():void => {
-		const tableHeight: number = document.querySelector('.table').offsetHeight - 2;
-		const tableLines: NodeListOf<HTMLElement> = document.querySelectorAll('.table .line');
+	const setHeightLines = (): void => {
+		const tableHeight: number = tableWrapper.offsetHeight - 20;
+		const tableLines: NodeListOf<HTMLElement> = tableWrapper.querySelectorAll('.resize-handle');
 		tableLines.forEach(item => item.style.height = `${tableHeight}px`);
 	}
 
-	const startResize = (event: Event): void => {
-		curCol = event.target.parentElement;
-		nxtCol = curCol.nextElementSibling;
-		pageX = event.pageX;
-
-		curColWidth = curCol.offsetWidth;
-		nxtColWidth = nxtCol ?? nxtCol.offsetWidth;
-
-	}
-
-	const resizeColumn = (event: Event): void => {
-		if (curCol) {
-			const diffX = event.pageX - pageX;
-
-			const nxtColName = nxtCol.querySelector('.column-name');
-			const curColName = curCol.querySelector('.column-name');
-
-			// if (table.offsetWidth > tableWidth) {
-			// 	curCol.style.width = curColWidth - 2 + 'px';
-			// 	curColName.style.width = curColWidth - 2 + 'px';
-			// 	return
-			// }
-
-			nxtCol.style.width = nxtCol ?? (nxtColWidth - (diffX))+'px';
-			nxtColName.style.width = nxtCol ?? (nxtColWidth - (diffX))+'px';
-
-			curCol.style.width = (curColWidth + diffX)+'px';
-			curColName.style.width = (curColWidth + diffX)+'px';
-		}
-	}
-
-	const clearResizeData = (): void => {
-		curCol = undefined;
-		nxtCol = undefined;
-		pageX = undefined;
-		nxtColWidth = undefined;
-		curColWidth = undefined
-	}
-
+	// TODO Нужно переписать
 	const toggleFilter = (index): void => {
-		const tableHeadColumns = table.querySelectorAll('thead th');
-		const tableBodyItems = table.querySelectorAll('tbody td');
+		const tableHeadColumns: NodeListOf<HTMLElement> = table.querySelectorAll('thead th');
+		const tableBodyItems: NodeListOf<HTMLElement> = table.querySelectorAll('tbody td');
 		const countColumns = tableHeadColumns.length;
 
 		tableHeadColumns[index].style.display = tableHeadColumns[index].style.display === 'none' ? '' : 'none';
@@ -211,27 +163,106 @@
 		for (let i = +index; i < tableBodyItems.length; i += countColumns) {
 			tableBodyItems[i].style.display = tableHeadColumns[index].style.display;
 		}
-
 	}
 
-	const closeWindowsFilters = (event): void => {
+	const closeWindowFilters = (event: Event): void => {
 		if (!event.target.closest('.table-actions') ){
 			windowPreview.value = false;
 			windowFilter.value = false;
 		}
 	}
 
+	const hideLastLine = (): void => {
+		const lines: NodeListOf<HTMLElement> = document.querySelectorAll('.resize-handle');
+		lines[lines.length - 1].style.display = 'none';
+	}
+
+	// Обновление размеров столбцов и синхронизация столбцов на странице с обьектом внутри
+	const correctHeadCells = () => {
+		const tableRow: NodeListOf<HTMLElement> = document.querySelectorAll('.table-row');
+		tableRow.forEach((item: HTMLElement): void => {
+			item.style.gridTemplateColumns = tableHeaders.value
+				.map(({ header, size }) => size)
+				.join(' ');
+		})
+	}
+
+	const onMouseMove = (event: Event) => requestAnimationFrame(() => {
+		const horizontalScrollOffset: number = document.documentElement.scrollLeft;
+		const width: number = (horizontalScrollOffset + event.clientX) - headerBeingResized.getBoundingClientRect().left;
+
+		let indexCurrentHead: number;
+
+		// Обновление объекта столбца с новым значением размера и присваивание индекса текущего столбца
+		const column = tableHeaders.value.find(({ header }, index) => {
+			if (header === headerBeingResized) {
+				indexCurrentHead = index
+				return true;
+			}
+		});
+
+		let tableWidth: number = 0;
+
+		const tableColumns: NodeListOf<HTMLElement> = document.querySelectorAll('.table-head .table-column');
+
+		tableColumns.forEach(item => {
+			tableWidth += +item.offsetWidth;
+		})
+
+		const additionalWidth: number = Math.floor(((tableWrapper.offsetWidth - tableWidth) > 0 ? (tableWrapper.offsetWidth - tableWidth) : 0) / ((tableHeaders.value.length - 1) - indexCurrentHead));
+
+		column.size = Math.max(min, width) + 'px'; // Enforce our minimum
+
+		// Для других заголовков, которые не имеют установленной ширины, зафиксируйте ее на вычисленной ширине.
+		tableHeaders.value.forEach((column) => {
+			if(column.size.startsWith('minmax')) {
+				column.size = parseInt(column.header.clientWidth, 10) + 'px';
+			}
+		});
+
+		for (let i = indexCurrentHead+1; i < tableHeaders.value.length; i++) {
+			tableHeaders.value[i].size = +tableHeaders.value[i].size.replace(/[^0-9]/g,"") + additionalWidth + 'px';
+		}
+
+		correctHeadCells();
+	});
+
+	const onMouseUp = () => {
+		console.log('onMouseUp');
+
+		window.removeEventListener('mousemove', onMouseMove);
+		window.removeEventListener('mouseup', onMouseUp);
+		headerBeingResized.classList.remove('header__being-resized');
+		headerBeingResized = null;
+	};
+
+	const initResize = ({ target }) => {
+		console.log('initResize');
+
+		headerBeingResized = target.parentNode;
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', onMouseUp);
+		headerBeingResized.classList.add('header__being-resized');
+	};
+
 	const checkSizeWindow = (): void => {
 		mobileTable.value = window.innerWidth <= 375
 	};
 
-	document.addEventListener('click', closeWindowsFilters)
+	document.addEventListener('click', closeWindowFilters)
 
 	onMounted(() => {
+		tableWrapper = document.querySelector('.table-wrapper');
 		setHeightLines();
-		table = document.querySelector('.table');
-		tableWidth = table.offsetWidth;
+		hideLastLine();
 		checkSizeWindow();
+		document.querySelectorAll('.table-head .table-column').forEach((header: HTMLElement, index: number) => {
+			const max = 1 + 'fr';
+			tableHeaders.value[index].header = header;
+			tableHeaders.value[index].size = `minmax(${min}px, ${max})`;
+
+			header.querySelector('.resize-handle').addEventListener('mousedown', initResize);
+		});
 	});
 </script>
 
@@ -310,54 +341,77 @@
 
 		& .table-wrapper {
 			overflow-x: auto;
-			padding-bottom: var(--large-scale);
+			margin-bottom: var(--large-scale);
 
-			& .table {
-				width: 100%;
+			& .table-row {
+				position: relative;
+				min-width: 100%;
+				width: auto;
+				flex: 1;
+				display: grid;
+				border-collapse: collapse;
 				user-select: none;
-				border-spacing: 0;
+				grid-template-columns:
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr)
+				    minmax(150px, 1fr);
 
-				& th {
+				& .table-column,
+				& .table-column-name {
 					position: relative;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+			}
+
+			& .table-head {
+				& .table-column {
 					border-top: 1px solid var(--border-color);
 					border-bottom: 1px solid var(--border-color);
 					text-align: start;
+					overflow: unset;
 					&:not(:last-child) {
 						border-right: 1px solid var(--border-color);
 					}
 
-					& .column-name {
+					& .table-column-name {
 						display: block;
+						text-align: left;
 						font-size: 16px;
 						font-weight: 600;
-						white-space: nowrap;
-						overflow: hidden;
 						padding: var(--normal-scale) var(--base-scale);
-						margin-right: 0;
 					}
 
-					& .line {
-						width: 2px;
+					& .resize-handle {
+						width: 6px;
 						background-color: #bcbcbc;
 						cursor: col-resize;
+						height: 100%;
 						position: absolute;
 						top: 0;
-						right: 0;
+						right: -4px;
 						opacity: 0;
 						transition: var(--transition);
-						padding: 3px;
+						z-index: 9;
 						&:hover {
 							opacity: 1 !important;
 						}
 					}
 				}
-				& tbody {
-					& tr {
-						position: relative;
-						& td {
-							padding: var(--small-scale) var(--normal-scale);
+			}
 
-						}
+			& .table-body {
+				& .table-column {
+					display: flex;
+					align-items: center;
+					padding: var(--small-scale) var(--normal-scale);
+
+					& div {
+						width: 100%;
 					}
 				}
 			}
@@ -375,11 +429,8 @@
 			border: dashed 2px #a6b7d4;
 		}
 
-		& .column-name {
-			opacity: 0;
-		}
-
-		& td {
+		& .table-column,
+		& .table-column-name {
 			opacity: 0;
 		}
 	}
