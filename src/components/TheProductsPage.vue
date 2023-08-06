@@ -111,7 +111,7 @@
 	};
 
 	const addItem = (): void => {
-		list.value.push({id: list.value.length});
+		list.value.push({actions: "", count: "", name: "", price: "", total: "", unitName: "", id: list.value.length});
 		setTimeout(() => setHeightLines());
 	};
 
