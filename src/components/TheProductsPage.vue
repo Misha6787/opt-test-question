@@ -33,7 +33,7 @@
 	import IconPlus from "@/components/icons/IconPlus.vue";
 	import VButton from "@/components/VButton.vue";
 	import ProductsTable from "@/components/ProductsTable.vue";
-	import {Ref, ref} from "vue";
+	import {Ref, ref, watchEffect} from "vue";
 
 	const headers: Ref = ref([
 		{
@@ -105,13 +105,14 @@
 	]);
 
 	const setHeightLines = (): void => {
-		const tableHeight: number = document.querySelector('.table').offsetHeight - 2;
-		const tableLines: NodeListOf<HTMLElement> = document.querySelectorAll('.table .line');
+		const tableWrapper: HTMLElement = document.querySelector('.table-wrapper');
+		const tableHeight: number = tableWrapper.offsetHeight - 10;
+		const tableLines: NodeListOf<HTMLElement> = document.querySelectorAll('.resize-handle');
 		tableLines.forEach(item => item.style.height = `${tableHeight}px`);
 	};
 
 	const addItem = (): void => {
-		list.value.push({actions: "", count: "", name: "", price: "", total: "", unitName: "", id: list.value.length});
+		list.value.push({id: list.value.length, actions: '', unitName: '', price: '', count: '', name: '', total: ''});
 		setTimeout(() => setHeightLines());
 	};
 
@@ -129,7 +130,6 @@
 
 		setTimeout(() => setHeightLines());
 	};
-
 
 </script>
 

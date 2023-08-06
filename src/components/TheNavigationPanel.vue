@@ -16,7 +16,7 @@
 		height: 100%;
 		top: 0;
 	}
-	@media (max-width: 375px) {
+	@media (max-width: 450px) {
 		.navigation-panel {
 			display: none;
 		}

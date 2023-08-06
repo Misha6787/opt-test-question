@@ -30,7 +30,7 @@
 		margin-bottom: var(--xlarge-scale);
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 450px) {
 		.page-content {
 			margin-left: 0;
 			padding: var(--normal-scale) var(--base-scale);

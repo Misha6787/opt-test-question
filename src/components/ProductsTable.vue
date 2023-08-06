@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, Ref, ref} from "vue";
+import {onMounted, Ref, ref, watch, watchEffect} from "vue";
 	import draggable from "vuedraggable";
 
 	import ProductsTableItem from "@/components/ProductsTableItem.vue";
@@ -246,10 +246,20 @@ import {onMounted, Ref, ref} from "vue";
 	};
 
 	const checkSizeWindow = (): void => {
-		mobileTable.value = window.innerWidth <= 375
+		mobileTable.value = window.innerWidth <= 450
 	};
 
 	document.addEventListener('click', closeWindowFilters)
+
+
+	watch(tableList, () => {
+		setTimeout(() => {
+			const tableItems: NodeListOf<HTMLElement> = document.querySelectorAll('.table-body .table-row');
+			const firstItem: HTMLElement = tableItems[0];
+			const lastItem: HTMLElement = tableItems[tableItems.length - 1];
+			lastItem.style.gridTemplateColumns = firstItem.style.gridTemplateColumns
+		})
+	}, { deep: true })
 
 	onMounted(() => {
 		tableWrapper = document.querySelector('.table-wrapper');
@@ -257,12 +267,12 @@ import {onMounted, Ref, ref} from "vue";
 		hideLastLine();
 		checkSizeWindow();
 		document.querySelectorAll('.table-head .table-column').forEach((header: HTMLElement, index: number) => {
-			const max = 1 + 'fr';
 			tableHeaders.value[index].header = header;
-			tableHeaders.value[index].size = `minmax(${min}px, ${max})`;
+			tableHeaders.value[index].size = `minmax(${min}px, 1fr)`;
 
 			header.querySelector('.resize-handle').addEventListener('mousedown', initResize);
 		});
+		window.addEventListener('resize', checkSizeWindow);
 	});
 </script>
 
@@ -435,7 +445,7 @@ import {onMounted, Ref, ref} from "vue";
 		}
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 450px) {
 		.table-contents {
 			background-color: unset;
 			box-shadow: unset;
