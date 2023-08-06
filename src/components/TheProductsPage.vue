@@ -33,9 +33,9 @@
 	import IconPlus from "@/components/icons/IconPlus.vue";
 	import VButton from "@/components/VButton.vue";
 	import ProductsTable from "@/components/ProductsTable.vue";
-	import {ref} from "vue";
+	import {Ref, ref} from "vue";
 
-	const headers = ref([
+	const headers: Ref = ref([
 		{
 			name: 'Номер',
 			key: 'id',
@@ -65,7 +65,7 @@
 			key: 'total',
 		}
 	]);
-	const list = ref([
+	const list: Ref = ref([
 		{
 			id: 0,
 			actions: '',

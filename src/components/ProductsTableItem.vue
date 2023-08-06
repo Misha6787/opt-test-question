@@ -59,11 +59,11 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 	import IconBurger from "@/components/icons/IconBurger.vue";
 	import IconVerticalDots from "@/components/icons/IconVerticalDots.vue";
 	import VInput from "@/components/VInput.vue";
-	import {onMounted, ref} from "vue";
+	import {onMounted, Ref, ref} from "vue";
 
 	const props = defineProps({
 		item: {
@@ -82,7 +82,7 @@
 
 	defineEmits(['deleteItem']);
 
-	const windowAction = ref(false);
+	const windowAction: Ref<boolean> = ref(false);
 	const helpSearchItems = [
 		'Мраморный щебень фр. 2-5 мм, 25кг',
 		'Мраморный щебень фр. 2-5 мм, 25кг (белый)',
@@ -92,7 +92,7 @@
 	];
 	let windowHelpSearch;
 
-	const helpSearchActive = ref([]);
+	const helpSearchActive: Ref = ref([]);
 
 	const closeWindowsActions = (event) => {
 		if (!event.target.closest('.action-icon')) {

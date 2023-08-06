@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-	import {onMounted, ref} from "vue";
+import {onMounted, Ref, ref} from "vue";
 	import draggable from "vuedraggable";
 
 	import ProductsTableItem from "@/components/ProductsTableItem.vue";
@@ -134,11 +134,11 @@
 
 	defineEmits(['updateList', 'deleteItem']);
 
-	const tableList = ref(props.list);
-	const tableHeaders = ref(props.headers);
-	const windowPreview = ref(false);
-	const windowFilter = ref(false);
-	const mobileTable = ref(false);
+	const tableList: Ref = ref(props.list);
+	const tableHeaders: Ref = ref(props.headers);
+	const windowPreview: Ref = ref(false);
+	const windowFilter: Ref = ref(false);
+	const mobileTable: Ref = ref(false);
 
 	const min: number = 30;
 	let headerBeingResized: HTMLElement | null;
